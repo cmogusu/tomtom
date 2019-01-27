@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import Search from './tomtom/Search.js';
-//import TestAutoSuggest from './tomtom/TestAutosuggest.js';
+//import Search from './tomtom/Search.js';
 import Autocomplete from './tomtom/Autocomplete.js';
 import { loadScript } from './tomtom/functions.js';
 
@@ -20,7 +19,7 @@ class App extends Component {
       <React.Fragment>
         <CssBaseline />
         <Autocomplete />
-        <Search />
+        {/* <Search /> */}
       </React.Fragment>
     );
   }

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { deburr } from 'lodash';
 import Downshift from 'downshift';
 import { withStyles } from '@material-ui/core/styles';
-import Textfield from '@material-ui/core/Textfield';
+import Textfield from '@material-ui/core/TextField';
 import Popper from '@material-ui/core/Popper';
 import Paper from '@material-ui/core/Paper';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -68,7 +68,7 @@ function renderInput(inputProps) {
 type renderSuggestionProps = {
   highlightedIndex: number,
   index: number,
-  itemProps: Object,
+  itemProps: {},
   selectedItem: string,
   suggestion: {
     label: string,
@@ -86,7 +86,7 @@ function renderSuggestion({ suggestion, index, itemProps, highlightedIndex, sele
       selected={isHighlighted}
       component="div"
       style={{
-        fontWeight: isSelected ? 500: 400,
+        fontWeight: isSelected ? 500 : 400,
       }}
     >
       {suggestion.label}
@@ -322,25 +322,25 @@ function IntergrationDownshift(props: IntergrationDownshiftProps) {
               InputProps: getInputProps({
                 placeholder: 'With Popper',
               }),
-              ref: node => {
+              ref: (node) => {
                 popperNode = node;
               },
             })}
             <Popper open={isOpen} anchorEl={popperNode}>
               <div {...(isOpen ? getMenuProps({}, { suppressRefError: true }) : {})}>
-                <Paper 
+                <Paper
                   square
-                  style={{ marginTop: 8, width:popperNode ? popperNode.clientWidth : null }}
+                  style={{ marginTop: 8, width: popperNode ? popperNode.clientWidth : null }}
                 >
-                {getSuggestions(inputValue).map((suggestion, index) => (
-                  renderSuggestion({
-                    suggestion,
-                    index,
-                    itemProps: getItemProps({ item: suggestion.label }),
-                    highlightedIndex,
-                    selectedItem,
-                  })
-                ))}
+                  {getSuggestions(inputValue).map((suggestion, index) => (
+                    renderSuggestion({
+                      suggestion,
+                      index,
+                      itemProps: getItemProps({ item: suggestion.label }),
+                      highlightedIndex,
+                      selectedItem,
+                    })
+                  ))}
                 </Paper>
               </div>
             </Popper>
