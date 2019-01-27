@@ -1,8 +1,9 @@
 // @flow
 import * as React from 'react';
-import Autosuggest from 'react-autosuggest';
+//import Autosuggest from 'react-autosuggest';
 import { isEmpty, debounce } from 'lodash';
 
+import Autosuggest from './Autosuggest.js';
 import apiKey from './apiKey.js';
 import { addTomtom } from './functions.js';
 

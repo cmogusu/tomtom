@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
+import CssBaseline from '@material-ui/core/CssBaseline';
 import Search from './tomtom/Search.js';
-import TestAutoSuggest from './tomtom/TestAutosuggest.js';
+//import TestAutoSuggest from './tomtom/TestAutosuggest.js';
+import Autocomplete from './tomtom/Autocomplete.js';
 import { loadScript } from './tomtom/functions.js';
 
 import './sdk/map.css';
@@ -16,7 +18,8 @@ class App extends Component {
   render() {
     return (
       <React.Fragment>
-        <TestAutoSuggest />
+        <CssBaseline />
+        <Autocomplete />
         <Search />
       </React.Fragment>
     );
