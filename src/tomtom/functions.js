@@ -45,6 +45,3 @@ export function addTomtom(Component) {
     }
   };
 }
-
-
-export const apiKey = 'DzPoabfwzJC55LeKKob7smFAnz85PVlH';

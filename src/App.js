@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Search from './tomtom/Search.js';
-import TestAutoSuggest from './tomtom/TestAutoSuggest.js';
+import TestAutoSuggest from './tomtom/TestAutosuggest.js';
 import { loadScript } from './tomtom/functions.js';
 
 import './sdk/map.css';
