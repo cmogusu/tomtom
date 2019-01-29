@@ -1,43 +1,25 @@
 // @flow
 import * as React from 'react';
-//import Autosuggest from 'react-autosuggest';
 import { isEmpty, debounce } from 'lodash';
-
-import Autosuggest from './Autosuggest.js';
 import apiKey from './apiKey.js';
-import { addTomtom } from './functions.js';
+import { withTomtom } from './functions.js';
+import Autocomplete from './Autocomplete.js';
+import Map from './Map.js';
 
-
-type Props = {
+type searchProps = {
   tomtom: Object,
 };
 
-type State = {
+
+type searchState = {
   results: Array,
   value: string,
+  classes: {},
 };
 
-class Search extends React.Component<Props, State> {
-  state = {
-    results: [],
-    value: 'washingto',
-    suggestions: [],
-  };
 
-  static getSuggestionValue(suggestedResult) {
-    const { name } = suggestedResult;
-    return name;
-  }
-
-  static renderSuggestion(suggestedResult) {
-    const { name } = suggestedResult;
-
-    return (
-      <div>{name}</div>
-    );
-  }
-
-  static filterResults(result) {
+class Search extends React.Component<searchProps, searchState> {
+  static filterResults(result, index) {
     if (isEmpty(result)) {
       return {};
     }
@@ -46,64 +28,52 @@ class Search extends React.Component<Props, State> {
     const { freeformAddress, country } = address;
 
     return {
-      name: `${freeformAddress} ${country}`,
+      index,
+      name: freeformAddress,
     };
   }
+
+  popperNode = false;
+
+  results = [];
+
+  inputValue = '';
+
+  state = {
+    suggestions: [],
+  };
+
 
   constructor(props) {
     super(props);
 
-    this.onChange = this.onChange.bind(this);
-    this.runSearch = this.runSearch.bind(this);
-    this.runSearch = debounce(this.runSearch, 100);
-    this.clearSuggestions = this.clearSuggestions.bind(this);
-    this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
+    this.runSearch = debounce(this.runSearch, 250);
   }
 
-  componentDidUpdate(prevProps) {
-    const { tomtom } = prevProps;
 
-    if (isEmpty(tomtom)) {
-      this.init();
+  getSuggestions = (value) => {
+    const oldValue = this.inputValue;
+    const inputValue = value.trim().toLowerCase();
+    const inputLength = inputValue.length;
+
+    if (inputLength > 2 && oldValue !== inputValue) {
+      this.inputValue = oldValue;
+      this.runSearch(inputValue);
     }
-  }
-
-  onChange(event) {
-    const { currentTarget } = event;
-    const { value } = currentTarget;
-
-    this.setState({ value });
-  }
+  };
 
 
-  onSuggestionsFetchRequested({ value }) {
-    const { results, value: oldValue } = this.state;
-    const suggestions = results.map(result => Search.filterResults(result));
-
-    if (oldValue.trim() !== value.trim()) {
-      this.runSearch(value);
-    }
-
-    this.setState({
-      suggestions,
-    });
-  }
-
-
-  init() {
+  runSearch = (value: string) => {
     const { tomtom } = this.props;
 
-    this.tomtom = tomtom;
-  }
-
-
-  runSearch(value: string) {
-    if (isEmpty(this.tomtom)) {
+    if (isEmpty(tomtom)) {
       console.log('had to bail. tomtom is no no');
       return;
     }
 
-    this.tomtom.fuzzySearch({
+    console.log('searching for ', value);
+
+    tomtom.fuzzySearch({
       key: apiKey,
       typeahead: true,
       countrySet: 'US',
@@ -111,50 +81,41 @@ class Search extends React.Component<Props, State> {
       .query(value)
       .go()
       .then((results) => {
-        const suggestions = results.map(result => Search.filterResults(result));
-        console.log(results, suggestions);
+        this.results = results;
+        console.log(results);
+        const suggestions = results.map((result, index) => Search.filterResults(result, index));
+        this.setState({ suggestions });
 
-        this.setState({
-          results,
-          suggestions,
-        });
+        console.log(results);
       })
       .catch((error) => {
         console.log('error', error);
       });
-  }
+  };
 
 
-  clearSuggestions() {
-    this.setState({
-      suggestions: [],
-    });
+  setSelectedValue = (selectedItem) => {
+    const { suggestions } = this.state;
+    const index = suggestions.findIndex(suggestion => suggestion.name === selectedItem);
+
+    console.log('selectedItem', selectedItem, index, this.results[index]);
   }
 
 
   render() {
-    const { value, suggestions } = this.state;
-    const inputProps = {
-      value,
-      placeholder: 'find location',
-      onChange: this.onChange,
-    };
+    const { suggestions } = this.state;
 
     return (
       <div>
-        { /* <input onChange={this.onChange} placeholder="Find any location..." value={value} /> */ }
-
-        <Autosuggest
+        <Autocomplete
+          setValue={this.getSuggestions}
           suggestions={suggestions}
-          onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-          onSuggestionsClearRequested={this.clearSuggestions}
-          getSuggestionValue={Search.getSuggestionValue}
-          renderSuggestion={Search.renderSuggestion}
-          inputProps={inputProps}
+          setSelectedValue={this.setSelectedValue}
         />
+        <Map />
       </div>
     );
   }
 }
 
-export default addTomtom(Search);
+export default withTomtom(Search);

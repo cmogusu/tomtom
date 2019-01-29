@@ -3,7 +3,7 @@ import React from 'react';
 
 export function loadScript() {
   const script = document.createElement('script');
-  script.src = process.env.PUBLIC_URL + '/sdk/tomtom.min.js';
+  script.src = `${process.env.PUBLIC_URL}/sdk/tomtom.min.js`;
   document.body.appendChild(script);
   script.async = true;
   script.onload = () => {
@@ -13,7 +13,7 @@ export function loadScript() {
 }
 
 
-export function addTomtom(Component) {
+export function withTomtom(Component) {
   return class extends React.Component {
     state = {
       tomtom: {},
@@ -41,7 +41,7 @@ export function addTomtom(Component) {
 
     render() {
       const { tomtom } = this.state;
-      return <Component tomtom={tomtom} />;
+      return <Component tomtom={tomtom} {...this.props} />;
     }
   };
 }

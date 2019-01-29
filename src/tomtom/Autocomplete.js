@@ -1,53 +1,19 @@
 import * as React from 'react';
-import { deburr } from 'lodash';
 import Downshift from 'downshift';
 import { withStyles } from '@material-ui/core/styles';
 import Textfield from '@material-ui/core/TextField';
 import Popper from '@material-ui/core/Popper';
 import Paper from '@material-ui/core/Paper';
 import MenuItem from '@material-ui/core/MenuItem';
-import Chip from '@material-ui/core/Chip';
 
-
-const suggestions = [
-  { label: 'Afghanistan' },
-  { label: 'Aland Islands' },
-  { label: 'Albania' },
-  { label: 'Algeria' },
-  { label: 'American Samoa' },
-  { label: 'Andorra' },
-  { label: 'Angola' },
-  { label: 'Anguilla' },
-  { label: 'Antarctica' },
-  { label: 'Antigua and Barbuda' },
-  { label: 'Argentina' },
-  { label: 'Armenia' },
-  { label: 'Aruba' },
-  { label: 'Australia' },
-  { label: 'Austria' },
-  { label: 'Azerbaijan' },
-  { label: 'Bahamas' },
-  { label: 'Bahrain' },
-  { label: 'Bangladesh' },
-  { label: 'Barbados' },
-  { label: 'Belarus' },
-  { label: 'Belgium' },
-  { label: 'Belize' },
-  { label: 'Benin' },
-  { label: 'Bermuda' },
-  { label: 'Bhutan' },
-  { label: 'Bolivia, Plurinational State of' },
-  { label: 'Bonaire, Sint Eustatius and Saba' },
-  { label: 'Bosnia and Herzegovina' },
-  { label: 'Botswana' },
-  { label: 'Bouvet Island' },
-  { label: 'Brazil' },
-  { label: 'British Indian Ocean Territory' },
-  { label: 'Brunei Darussalam' },
-];
 
 function renderInput(inputProps) {
-  const { InputProps, classes, ref, ...other } = inputProps;
+  const {
+    InputProps,
+    classes,
+    ref,
+    ...other
+  } = inputProps;
 
   return (
     <Textfield
@@ -75,159 +41,36 @@ type renderSuggestionProps = {
   }
 };
 
-function renderSuggestion({ suggestion, index, itemProps, highlightedIndex, selectedItem }: renderSuggestionProps) {
+function renderSuggestion({
+  suggestion,
+  index,
+  itemProps,
+  highlightedIndex,
+  selectedItem,
+}: renderSuggestionProps) {
   const isHighlighted = highlightedIndex === index;
-  const isSelected = (selectedItem || '').indexOf(suggestion.label) > -1;
+  const isSelected = (selectedItem || '').indexOf(suggestion.name) > -1;
 
   return (
     <MenuItem
       {...itemProps}
-      key={suggestion.label}
+      key={index}
       selected={isHighlighted}
       component="div"
       style={{
         fontWeight: isSelected ? 500 : 400,
       }}
     >
-      {suggestion.label}
+      {suggestion.name}
     </MenuItem>
   );
-}
-
-
-function getSuggestions(value) {
-  const inputValue = deburr(value.trim().toLowerCase());
-  const inputLength = inputValue.length;
-  let count = 0;
-
-  return inputLength === 0 
-    ? []
-    : suggestions.filter((suggestion) => {
-      const keep = count < 5 && suggestion.label.slice(0, inputLength).toLowerCase() === inputValue;
-
-      if (keep) {
-        count += 1;
-      }
-
-      return keep;
-    });
-}
-
-type AutocompleteProps = {
-  classes: {},
-};
-
-class DownshiftMultiple extends React.Component<AutocompleteProps> {
-  state = {
-    inputValue: '',
-    selectedItem: [],
-  };
-
-  handleKeyDown = (event) => {
-    const { inputValue, selectedItem } = this.state;
-
-    if (selectedItem.length && !inputValue.length && event.key === 'Backspace') {
-      this.setState({
-        selectedItem: selectedItem.slice(0, selectedItem.length -1),
-      });
-    }
-  };
-
-  handleInputChange = (event) => {
-    this.setState({
-      inputValue: event.target.value,
-    });
-  };
-
-
-  handleChange = (item) => {
-    let { selectedItem } = this.state;
-
-    if (selectedItem.indexOf(item) === -1) {
-      selectedItem = [...selectedItem, item];
-    }
-
-    this.setState({
-      inputValue: '',
-      selectedItem,
-    });
-  };
-
-  handleDelete = (item) => {
-    this.setState((state) => {
-      const selectedItem = [...state.selectedItem];
-      selectedItem.splice(selectedItem.indexOf(item), 1);
-
-      return {
-        selectedItem,
-      };
-    });
-  };
-
-  render() {
-    const { classes } = this.props;
-    const { inputValue, selectedItem } = this.state;
-
-    return (
-      <Downshift
-        id="downshift-multiple"
-        inputValue={inputValue}
-        onChange={this.handleChange}
-        selectedItem={selectedItem}
-      >
-        {({
-          getInputProps,
-          getItemProps,
-          isOpen,
-          inputValue: inputValue2,
-          selectedItem: selectedItem2,
-          highlightedIndex,
-        }) => (
-          <div className={classes.container}>
-            {renderInput({
-              fullWidth: true,
-              classes,
-              InputProps: getInputProps({
-                startAdornment: selectedItem.map(item => (
-                  <Chip
-                    key={item}
-                    tabIndex={-1}
-                    label={item}
-                    className={classes.chip}
-                    onDelete={this.handleDelete(item)}
-                  />
-                )),
-                onChange: this.handleInputChange,
-                onKeyDown: this.handleKeyDown,
-                placeholder: 'Select multiple countries',
-              }),
-              label: 'Label',
-            })}
-            {isOpen ? (
-              <Paper className={classes.paper} square>
-                {getSuggestions(inputValue2).map((suggestion, index) => (
-                  renderSuggestion({
-                    suggestion,
-                    index,
-                    itemProps: getItemProps({ item: suggestion.label }),
-                    highlightedIndex,
-                    selectedItem: selectedItem2,
-                  })
-                ))}
-              </Paper>
-            ) : null}
-          </div>
-        )}
-      </Downshift>
-    );
-  }
 }
 
 
 const styles = theme => ({
   root: {
     flexGrow: 1,
-    height: 250,
+    height: 'auto',
   },
   container: {
     flexGrow: 1,
@@ -258,21 +101,35 @@ const styles = theme => ({
 let popperNode;
 
 type IntergrationDownshiftProps = {
+  suggestions: Array<{}>,
+  setValue: Function,
+  setSelectedValue: Function,
   classes: {},
 };
 
 function IntergrationDownshift(props: IntergrationDownshiftProps) {
-  const { classes } = props;
+  const {
+    classes,
+    suggestions,
+    setValue,
+    setSelectedValue,
+  } = props;
+
+  const onChange = (event) => {
+    const { currentTarget } = event;
+    const { value } = currentTarget;
+
+    setValue(value);
+  };
 
   return (
     <div className={classes.root}>
-      <Downshift id="downshift-simple">
+      <Downshift id="downshift-popper" onChange={setSelectedValue}>
         {({
           getInputProps,
           getItemProps,
           getMenuProps,
           highlightedIndex,
-          inputValue,
           isOpen,
           selectedItem,
         }) => (
@@ -281,45 +138,7 @@ function IntergrationDownshift(props: IntergrationDownshiftProps) {
               fullWidth: true,
               classes,
               InputProps: getInputProps({
-                placeholder: 'Search a country ',
-              }),
-            })}
-            <div {...getItemProps()}>
-              {isOpen ? (
-                <Paper className={classes.paper} square>
-                  {getSuggestions(inputValue).map((suggestion, index) => (
-                    renderSuggestion({
-                      suggestion,
-                      index,
-                      itemProps: getItemProps({ item: suggestion.label }),
-                      highlightedIndex,
-                      selectedItem,
-                    })
-                  ))}
-                </Paper>
-              ) : null}
-            </div>
-          </div>
-        )}
-      </Downshift>
-      <div className={classes.divider} />
-      <DownshiftMultiple classes={classes} />
-      <div className={classes.divider} />
-      <Downshift id="downshift-popper">
-        {({
-          getInputProps,
-          getItemProps,
-          getMenuProps,
-          highlightedIndex,
-          inputValue,
-          isOpen,
-          selectedItem,
-        }) => (
-          <div className={classes.container}>
-            {renderInput({
-              fullWidth: true,
-              classes,
-              InputProps: getInputProps({
+                onChange,
                 placeholder: 'With Popper',
               }),
               ref: (node) => {
@@ -332,11 +151,11 @@ function IntergrationDownshift(props: IntergrationDownshiftProps) {
                   square
                   style={{ marginTop: 8, width: popperNode ? popperNode.clientWidth : null }}
                 >
-                  {getSuggestions(inputValue).map((suggestion, index) => (
+                  {suggestions.map((suggestion, index) => (
                     renderSuggestion({
                       suggestion,
                       index,
-                      itemProps: getItemProps({ item: suggestion.label }),
+                      itemProps: getItemProps({ item: suggestion.name }),
                       highlightedIndex,
                       selectedItem,
                     })
